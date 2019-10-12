@@ -9,6 +9,7 @@ let enemy_coordinates = [5,5];
 var enemy_coordinates_after = [5,5];
 let timer = 10;
 var collision = 0;
+let game_won = 0;
 
 function setup(){
 	createCanvas(canvas_size,canvas_size);
@@ -47,7 +48,9 @@ function draw(){
 	enemyLogic();
 	if(enemy_captured()){
 		timer = 0;
+		game_won = 1;
 	  text("YOU WIN", 0, 0);
+	  noLoop();
 	}
 }
 function enemyLogic(){
@@ -214,14 +217,16 @@ function getAllIndexes(arr, val) {
 }
 
 function timer_loop(){
-	if(timer !== 0){
-		text(timer, 0, 0);
+	if(timer > 0){
+		text(timer.toFixed(2), 0, 0);
 	}
-	if (frameCount % 60 == 0 && timer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
-	  timer--;
+	if (timer > 0 && game_won == 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
+	  timer -= 1/60;
 	}
-	if (timer == 0) {
+	if (timer < 0 && game_won == 0) {
+		clear();
 	  text("GAME OVER", 0, 0);
+	  noLoop();
 	}
 }
 
