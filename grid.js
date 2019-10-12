@@ -16,10 +16,12 @@ function setup(){
 
 function draw(){
 	background(255);
+	strokeWeight(1);
 	for(let i = 0; i < grid_size; i++){
 		line(margin + i * (canvas_size - 2 * margin)/(grid_size - 1), margin, margin + i * (canvas_size - 2 * margin)/(grid_size - 1), canvas_size - margin);
 		line(margin, margin + i * (canvas_size - 2 * margin)/(grid_size - 1), canvas_size - margin, margin + i * (canvas_size - 2 * margin)/(grid_size - 1));
 	}
+	strokeWeight(0);
 	for(let i = 0; i < ball_coordinates_list.length; i++){
 		let transformed_coords =  transformation(ball_coordinates_list[i]);
 		if(i == 0){
@@ -43,13 +45,17 @@ function draw(){
 	fill(color(255,165,0));
 	square(transformed_enemy_coords[0]-15,transformed_enemy_coords[1]-15,30);
 	enemyLogic();
+	if(enemy_captured()){
+		timer = 0;
+	  text("YOU WIN", 0, 0);
+	}
 }
 function enemyLogic(){
 	enemy_overlap();
-	//enemy_coordinates_after = enemy_coordinates; 
+	//enemy_coordinates_after = enemy_coordinates;
 	var Action = Math.floor((Math.random() * 5));
 	//console.log(enemy_coordinates[0]);
-	if(frameCount%30 == 0 && timer > 0){
+	if(frameCount%15 == 0 && timer > 0){
 	switch(Action){
 		case 1:
 			enemy_coordinates_after[0] = enemy_coordinates[0] - 1;
@@ -86,7 +92,7 @@ function enemyLogic(){
 			enemyLogic();
 		}
 			break;
-		
+
 		case 4:
 			enemy_coordinates_after[0] = enemy_coordinates[0];
 			enemy_coordinates_after[1] = enemy_coordinates[1]+1;
@@ -105,34 +111,33 @@ function enemyLogic(){
 	if(enemy_overlap == 1){
 		enemyLogic();
 	}
+	}
 }
-}
-
 
 function keyPressed(){
 	ball_coordinates_list_before = JSON.parse(JSON.stringify(ball_coordinates_list));
-	if (keyCode === UP_ARROW && ball_coordinates_list[3][1] > 0) {
+	if (keyCode === 104 && ball_coordinates_list[3][1] > 0) {
 		ball_coordinates_list[3][1] -= 1;
 	}
-	if (keyCode === DOWN_ARROW && ball_coordinates_list[3][1] < grid_size - 1) {
+	if (keyCode === 101 && ball_coordinates_list[3][1] < grid_size - 1) {
 		ball_coordinates_list[3][1] += 1;
 	}
-	if (keyCode === LEFT_ARROW && ball_coordinates_list[3][0] > 0) {
+	if (keyCode === 100 && ball_coordinates_list[3][0] > 0) {
 		ball_coordinates_list[3][0] -= 1;
 	}
-	if (keyCode === RIGHT_ARROW && ball_coordinates_list[3][0] < grid_size - 1) {
+	if (keyCode === 102 && ball_coordinates_list[3][0] < grid_size - 1) {
 		ball_coordinates_list[3][0] += 1;
 	}
-	if (keyCode === 73 && ball_coordinates_list[2][1] > 0) {
+	if (keyCode === UP_ARROW && ball_coordinates_list[2][1] > 0) {
 		ball_coordinates_list[2][1] -= 1;
 	}
-	if (keyCode === 75 && ball_coordinates_list[2][1] < grid_size - 1) {
+	if (keyCode === DOWN_ARROW && ball_coordinates_list[2][1] < grid_size - 1) {
 		ball_coordinates_list[2][1] += 1;
 	}
-	if (keyCode === 74 && ball_coordinates_list[2][0] > 0) {
+	if (keyCode === LEFT_ARROW && ball_coordinates_list[2][0] > 0) {
 		ball_coordinates_list[2][0] -= 1;
 	}
-	if (keyCode === 76 && ball_coordinates_list[2][0] < grid_size - 1) {
+	if (keyCode === RIGHT_ARROW && ball_coordinates_list[2][0] < grid_size - 1) {
 		ball_coordinates_list[2][0] += 1;
 	}
 	if (keyCode === 84 && ball_coordinates_list[1][1] > 0) {
@@ -176,7 +181,7 @@ function collision_detect(){
 				ball_coordinates_list[index_list[j]] = ball_coordinates_list_before[index_list[j]];
 			}
 		}
-		
+
 	}
 
 }
@@ -197,8 +202,7 @@ function enemy_overlap(){
 		else{
 			collision = 0;
 		}
-}
-
+	}
 }
 
 function getAllIndexes(arr, val) {
@@ -210,11 +214,21 @@ function getAllIndexes(arr, val) {
 }
 
 function timer_loop(){
-	text(timer, 0, 0);
+	if(timer !== 0){
+		text(timer, 0, 0);
+	}
 	if (frameCount % 60 == 0 && timer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
 	  timer--;
 	}
 	if (timer == 0) {
 	  text("GAME OVER", 0, 0);
 	}
+}
+
+function enemy_captured(){
+	let right = getAllIndexes(ball_coordinates_list, [enemy_coordinates[0] + 1, enemy_coordinates[1]]).length > 0;
+	let left = getAllIndexes(ball_coordinates_list, [enemy_coordinates[0] - 1, enemy_coordinates[1]]).length > 0;
+	let up = getAllIndexes(ball_coordinates_list, [enemy_coordinates[0], enemy_coordinates[1] + 1]).length > 0;
+	let down = getAllIndexes(ball_coordinates_list, [enemy_coordinates[0], enemy_coordinates[1] - 1]).length > 0;
+	return right && left && up && down;
 }
