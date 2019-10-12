@@ -9,6 +9,7 @@ let enemy_coordinates = [5,5];
 var enemy_coordinates_after = [5,5];
 let timer = 10;
 var collision = 0;
+let timerUp = false;
 let game_won = 0;
 
 function setup(){
@@ -42,6 +43,10 @@ function draw(){
 	textAlign(LEFT, TOP);
 	textSize(100);
 	timer_loop();
+	timerSpawn();
+	let transformed_timer_coords = transformation(timer_coordinates);
+	fill(color(0,0,0));
+	ellipse(transformed_timer_coords[0],transformed_timer_coords[1],10,10);
 	let transformed_enemy_coords = transformation(enemy_coordinates);
 	fill(color(255,165,0));
 	square(transformed_enemy_coords[0]-15,transformed_enemy_coords[1]-15,30);
@@ -174,7 +179,13 @@ function keyPressed(){
 function transformation(coordinates){
 	return [margin + coordinates[0] * (canvas_size - 2 * margin)/(grid_size - 1), margin + coordinates[1] * (canvas_size - 2 * margin)/(grid_size - 1)];
 }
-
+function timerSpawn(){
+	if(timerUp == false){
+		timer_coordinates[0] = Math.floor(Math.random() * (grid_size));
+		timer_coordinates[1] = Math.floor(Math.random() * (grid_size));
+		timerUp = true;
+	}
+}
 function collision_detect(){
 	for (let i = 0; i < ball_coordinates_list.length; i++){
 		// console.log(ball_coordinates_list[i], ball_coordinates_list_before[i]);
@@ -217,6 +228,15 @@ function getAllIndexes(arr, val) {
 }
 
 function timer_loop(){
+	for(let i = 0; i < ball_coordinates_list.length; i++){
+		if(timer_coordinates[0] == ball_coordinates_list[i][0] && timer_coordinates[1] == ball_coordinates_list[i][1] && timerUp == true){
+			timer = timer + 1;
+			timerUp = false;
+			timerSpawn();
+			break;
+		}
+
+	}
 	if(timer > 0){
 		text(timer.toFixed(2), 0, 0);
 	}
