@@ -6,6 +6,8 @@ let canvas_size = 600;
 let ball_coordinates_list = [[0,0],[0,grid_size - 1],[grid_size - 1,0],[grid_size - 1,grid_size - 1]];
 let ball_coordinates_list_before = [];
 let enemy_coordinates = [5,5];
+let timer = 10;
+
 function setup(){
 	createCanvas(canvas_size,canvas_size);
 }
@@ -32,9 +34,12 @@ function draw(){
 		}
 		ellipse(transformed_coords[0], transformed_coords[1], 20, 20);
 	}
-let transformed_enemy_coords = transformation(enemy_coordinates);
-fill(color(255,165,0));
-square(transformed_enemy_coords[0]-15,transformed_enemy_coords[1]-15,30);
+	textAlign(LEFT, TOP);
+	textSize(100);
+	timer_loop();
+	let transformed_enemy_coords = transformation(enemy_coordinates);
+	fill(color(255,165,0));
+	square(transformed_enemy_coords[0]-15,transformed_enemy_coords[1]-15,30);
 }
 
 function keyPressed(){
@@ -112,4 +117,14 @@ function getAllIndexes(arr, val) {
 		if (JSON.stringify(arr[i]) == JSON.stringify(val))
 			indexes.push(i);
 	return indexes;
+}
+
+function timer_loop(){
+	text(timer, 0, 0);
+	if (frameCount % 60 == 0 && timer > 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
+	  timer--;
+	}
+	if (timer == 0) {
+	  text("GAME OVER", 0, 0);
+	}
 }
