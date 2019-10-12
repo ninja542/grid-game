@@ -1,8 +1,10 @@
-var grid_size = 9;
-var margin = 10;
-var canvas_size = 600;
-var ball_coordinates_list = [[0,0],[0,1],[1,2],[1,3]];
-var ball_coordinates_list_before = [];
+/* jshint esversion: 6 */
+
+let grid_size = 9;
+let margin = 10;
+let canvas_size = 600;
+let ball_coordinates_list = [[0,0],[0,grid_size - 1],[grid_size - 1,0],[grid_size - 1,grid_size - 1]];
+let ball_coordinates_list_before = [];
 
 function setup(){
 	createCanvas(canvas_size,canvas_size);
@@ -10,12 +12,12 @@ function setup(){
 
 function draw(){
 	background(255);
-	for(var i = 0; i < grid_size; i++){
+	for(let i = 0; i < grid_size; i++){
 		line(margin + i * (canvas_size - 2 * margin)/(grid_size - 1), margin, margin + i * (canvas_size - 2 * margin)/(grid_size - 1), canvas_size - margin);
 		line(margin, margin + i * (canvas_size - 2 * margin)/(grid_size - 1), canvas_size - margin, margin + i * (canvas_size - 2 * margin)/(grid_size - 1));
 	}
-	for(var i = 0; i < ball_coordinates_list.length; i++){
-		var transformed_coords =  transformation(ball_coordinates_list[i]);
+	for(let i = 0; i < ball_coordinates_list.length; i++){
+		let transformed_coords =  transformation(ball_coordinates_list[i]);
 		if(i == 0){
 			fill(color(255,0,0));
 		}
@@ -90,11 +92,21 @@ function transformation(coordinates){
 }
 
 function collision_detect(){
-	for (var i = 0; i < ball_coordinates_list.length; i++){
-		if(ball_coordinates_list_before[i] == ball_coordinates_list[i]){
-			console.log("collision detected");
-			console.log(ball_coordinates_list[i], ball_coordinates_list_before[i]);
-			ball_coordinates_list[i] = ball_coordinates_list_before[i];
+	for (let i = 0; i < ball_coordinates_list.length; i++){
+		// console.log(ball_coordinates_list[i], ball_coordinates_list_before[i]);
+		let index_list = getAllIndexes(ball_coordinates_list, ball_coordinates_list[i]);
+		if(index_list.length > 1){
+			for(let j = 0; j < index_list.length; j++){
+				ball_coordinates_list[index_list[j]] = ball_coordinates_list_before[index_list[j]];
+			}
 		}
 	}
+}
+
+function getAllIndexes(arr, val) {
+	var indexes = [];
+	for(i = 0; i < arr.length; i++)
+		if (JSON.stringify(arr[i]) == JSON.stringify(val))
+			indexes.push(i);
+	return indexes;
 }
