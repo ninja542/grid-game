@@ -5,7 +5,7 @@ let margin = 10;
 let canvas_size = 600;
 let ball_coordinates_list = [[0,0],[0,grid_size - 1],[grid_size - 1,0],[grid_size - 1,grid_size - 1]];
 let ball_coordinates_list_before = [];
-
+let enemy_coordinates = [5,5];
 function setup(){
 	createCanvas(canvas_size,canvas_size);
 }
@@ -32,6 +32,9 @@ function draw(){
 		}
 		ellipse(transformed_coords[0], transformed_coords[1], 20, 20);
 	}
+let transformed_enemy_coords = transformation(enemy_coordinates);
+fill(color(255,165,0));
+square(transformed_enemy_coords[0]-15,transformed_enemy_coords[1]-15,30);
 }
 
 function keyPressed(){
