@@ -6,7 +6,9 @@ let canvas_size = 600;
 let ball_coordinates_list = [[0,0],[0,grid_size - 1],[grid_size - 1,0],[grid_size - 1,grid_size - 1]];
 let ball_coordinates_list_before = [];
 let enemy_coordinates = [5,5];
+var enemy_coordinates_after = [5,5];
 let timer = 10;
+var collision = 0;
 
 function setup(){
 	createCanvas(canvas_size,canvas_size);
@@ -40,7 +42,72 @@ function draw(){
 	let transformed_enemy_coords = transformation(enemy_coordinates);
 	fill(color(255,165,0));
 	square(transformed_enemy_coords[0]-15,transformed_enemy_coords[1]-15,30);
+	enemyLogic();
 }
+function enemyLogic(){
+	enemy_overlap();
+	//enemy_coordinates_after = enemy_coordinates; 
+	var Action = Math.floor((Math.random() * 5));
+	//console.log(enemy_coordinates[0]);
+	if(frameCount%30 == 0 && timer > 0){
+	switch(Action){
+		case 1:
+			enemy_coordinates_after[0] = enemy_coordinates[0] - 1;
+			enemy_coordinates_after[1] = enemy_coordinates[1];
+			enemy_overlap();
+			if(enemy_coordinates[0] > 1 && collision == 0)
+			{
+			enemy_coordinates[0] -= 1; //left
+			}
+			else
+			{
+				enemyLogic();
+			}
+			break;
+		case 2:
+			enemy_coordinates_after[0] = enemy_coordinates[0];
+			enemy_coordinates_after[1] = enemy_coordinates[1]-1;
+			enemy_overlap();
+			if(enemy_coordinates[1] > 1 && collision == 0){
+			enemy_coordinates[1] -= 1; //up
+			}
+			else{
+				enemyLogic();
+			}
+			break;
+		case 3:
+			enemy_coordinates_after[0] = enemy_coordinates[0] + 1;
+			enemy_coordinates_after[1] = enemy_coordinates[1];
+			enemy_overlap();
+			if(enemy_coordinates[0]< grid_size - 2 && collision == 0){
+			enemy_coordinates[0] += 1; //right
+		}
+		else{
+			enemyLogic();
+		}
+			break;
+		
+		case 4:
+			enemy_coordinates_after[0] = enemy_coordinates[0];
+			enemy_coordinates_after[1] = enemy_coordinates[1]+1;
+			enemy_overlap();
+		if(enemy_coordinates[1] < grid_size - 2 && collision == 0){
+			enemy_coordinates[1] += 1; //down
+		}
+		else{
+			enemyLogic();
+			break;
+		}
+		default: //stay
+			break;
+	}
+	enemy_overlap();
+	if(enemy_overlap == 1){
+		enemyLogic();
+	}
+}
+}
+
 
 function keyPressed(){
 	ball_coordinates_list_before = JSON.parse(JSON.stringify(ball_coordinates_list));
@@ -93,6 +160,7 @@ function keyPressed(){
 		ball_coordinates_list[0][0] += 1;
 	}
 	collision_detect(ball_coordinates_list_before, ball_coordinates_list);
+	enemy_detect(ball_coordinates_list_before, ball_coordinates_list);
 }
 
 function transformation(coordinates){
@@ -108,7 +176,29 @@ function collision_detect(){
 				ball_coordinates_list[index_list[j]] = ball_coordinates_list_before[index_list[j]];
 			}
 		}
+		
 	}
+
+}
+function enemy_detect(){
+	for(let i = 0; i < ball_coordinates_list.length; i++){
+		if(enemy_coordinates[0] == ball_coordinates_list[i][0] && enemy_coordinates[1] == ball_coordinates_list[i][1]){
+			ball_coordinates_list[i] = ball_coordinates_list_before[i];
+		}
+
+	}
+}
+function enemy_overlap(){
+	for(let i = 0; i < ball_coordinates_list.length; i++){
+		if(enemy_coordinates_after[0] == ball_coordinates_list[i][0] && enemy_coordinates_after[1] == ball_coordinates_list[i][1]){
+			collision = 1;
+			break;
+		}
+		else{
+			collision = 0;
+		}
+}
+
 }
 
 function getAllIndexes(arr, val) {
