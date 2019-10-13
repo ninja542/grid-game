@@ -7,13 +7,20 @@ let ball_coordinates_list = [[0,0],[0,grid_size - 1],[grid_size - 1,0],[grid_siz
 let ball_coordinates_list_before = [];
 let enemy_coordinates = [5,5];
 var enemy_coordinates_after = [5,5];
+let timer_coordinates = [];
 let timer = 10;
 var collision = 0;
 let timerUp = false;
 let game_won = 0;
+let button;
 
 function setup(){
 	createCanvas(canvas_size,canvas_size);
+	button = document.createElement('BUTTON');
+	button.innerHTML = "Click to Restart";
+	button.addEventListener('click', reset);
+	document.body.appendChild(button);
+	button.style.display = 'none';
 }
 
 function draw(){
@@ -54,8 +61,10 @@ function draw(){
 	if(enemy_captured()){
 		timer = 0;
 		game_won = 1;
+		background(255);
 	  text("YOU WIN", 0, 0);
 	  noLoop();
+	  button_function();
 	}
 }
 function enemyLogic(){
@@ -244,9 +253,10 @@ function timer_loop(){
 	  timer -= 1/60;
 	}
 	if (timer < 0 && game_won == 0) {
-		clear();
+		background(255);
 	  text("GAME OVER", 0, 0);
 	  noLoop();
+	  button_function();
 	}
 }
 
@@ -256,4 +266,24 @@ function enemy_captured(){
 	let up = getAllIndexes(ball_coordinates_list, [enemy_coordinates[0], enemy_coordinates[1] + 1]).length > 0;
 	let down = getAllIndexes(ball_coordinates_list, [enemy_coordinates[0], enemy_coordinates[1] - 1]).length > 0;
 	return right && left && up && down;
+}
+
+function reset(){
+	ball_coordinates_list = [[0,0],[0,grid_size - 1],[grid_size - 1,0],[grid_size - 1,grid_size - 1]];
+	ball_coordinates_list_before = [];
+	enemy_coordinates = [5,5];
+	enemy_coordinates_after = [5,5];
+	timer_coordinates = [];
+	timer = 10;
+	collision = 0;
+	timerUp = false;
+	game_won = 0;
+	loop();
+	button.style.display = 'none';
+}
+
+function button_function(){
+	button.style.display = "block";
+	// button.position(19, 19);
+	// button.mousePressed(reset);
 }
