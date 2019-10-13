@@ -8,11 +8,13 @@ let ball_coordinates_list_before = [];
 let enemy_coordinates = [5,5];
 var enemy_coordinates_after = [5,5];
 let timer_coordinates = [];
+let bullet_list = [];
 let timer = 10;
 var collision = 0;
 let timerUp = false;
 let game_won = 0;
 let button;
+let health = 8;
 
 function setup(){
 	createCanvas(canvas_size,canvas_size);
@@ -45,7 +47,7 @@ function draw(){
 		if(i == 3){
 			fill(color(255,0,255));
 		}
-		ellipse(transformed_coords[0], transformed_coords[1], 20, 20);
+		ellipse(transformed_coords[0], transformed_coords[1], 20);
 	}
 	textAlign(LEFT, TOP);
 	textSize(100);
@@ -58,6 +60,24 @@ function draw(){
 	fill(color(255,165,0));
 	square(transformed_enemy_coords[0]-15,transformed_enemy_coords[1]-15,30);
 	enemyLogic();
+	spawn_bullet();
+	for(let i = 0; i < bullet_list.length; i++){
+		bullet_list[i].draw();
+		bullet_list[i].update();
+		if(bullet_list[i].x > canvas_size || bullet_list[i].x < 0 || bullet_list[i].y > canvas_size || bullet_list[i].y < 0){
+			bullet_list.splice(i, 1);
+			continue;
+		}
+		for(let j = 0; j < ball_coordinates_list.length; j++){
+			let transformed_coords = transformation(ball_coordinates_list[j]);
+			if(collideCircleCircle(transformed_coords[0], transformed_coords[1], 40, bullet_list[i].x, bullet_list[i].y,20)){
+				bullet_list.splice(i,1);
+				health -= 1;
+				break;
+			}
+		}
+	}
+	rect(0,0,health*(canvas_size/8),10);
 	if(enemy_captured()){
 		timer = 0;
 		game_won = 1;
@@ -188,6 +208,7 @@ function keyPressed(){
 function transformation(coordinates){
 	return [margin + coordinates[0] * (canvas_size - 2 * margin)/(grid_size - 1), margin + coordinates[1] * (canvas_size - 2 * margin)/(grid_size - 1)];
 }
+
 function timerSpawn(){
 	if(timerUp == false){
 		timer_coordinates[0] = Math.floor(Math.random() * (grid_size));
@@ -195,6 +216,7 @@ function timerSpawn(){
 		timerUp = true;
 	}
 }
+
 function collision_detect(){
 	for (let i = 0; i < ball_coordinates_list.length; i++){
 		// console.log(ball_coordinates_list[i], ball_coordinates_list_before[i]);
@@ -252,7 +274,7 @@ function timer_loop(){
 	if (timer > 0 && game_won == 0) { // if the frameCount is divisible by 60, then a second has passed. it will stop at 0
 	  timer -= 1/60;
 	}
-	if (timer < 0 && game_won == 0) {
+	if (timer < 0 && game_won == 0 || health == 0) {
 		background(255);
 	  text("GAME OVER", 0, 0);
 	  noLoop();
@@ -268,12 +290,19 @@ function enemy_captured(){
 	return right && left && up && down;
 }
 
+function spawn_bullet(){
+	if(frameCount % 30 == 0){
+		bullet_list.push(new Bullet(enemy_coordinates[0],enemy_coordinates[1],round(random(3))));
+	}
+}
+
 function reset(){
 	ball_coordinates_list = [[0,0],[0,grid_size - 1],[grid_size - 1,0],[grid_size - 1,grid_size - 1]];
 	ball_coordinates_list_before = [];
 	enemy_coordinates = [5,5];
 	enemy_coordinates_after = [5,5];
 	timer_coordinates = [];
+	bullet_list = [];
 	timer = 10;
 	collision = 0;
 	timerUp = false;
@@ -286,4 +315,35 @@ function button_function(){
 	button.style.display = "block";
 	// button.position(19, 19);
 	// button.mousePressed(reset);
+}
+
+class Bullet{
+	constructor(start_x, start_y, direction){
+		let transformed_bullet_coords = transformation(enemy_coordinates);
+		this.x = transformed_bullet_coords[0];
+		this.y = transformed_bullet_coords[1];
+		this.direction = direction;
+	}
+	draw(){
+		fill(color(255,0,0));
+		ellipse(this.x, this.y, 10);
+	}
+	update(){
+		if(this.direction == 0){
+			this.x += 5;
+			this.y += 5;
+		}
+		if(this.direction == 1){
+			this.x -= 5;
+			this.y += 5;
+		}
+		if(this.direction == 2){
+			this.x += 5;
+			this.y -= 5;
+		}
+		if(this.direction == 3){
+			this.x -= 5;
+			this.y -= 5;
+		}
+	}
 }
